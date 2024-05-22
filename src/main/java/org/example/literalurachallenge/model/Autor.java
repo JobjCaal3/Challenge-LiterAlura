@@ -14,27 +14,25 @@ public class Autor {
     private Long idautor;
     private String nombre;
     private String fechaNacimiento;
-    private String fechaFallcimiento;
+    private String fechaFallecimiento;
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinTable(name = "autores_Libros"
-            , joinColumns = @JoinColumn(name = "autor_id", referencedColumnName = "id_autor")
-            , inverseJoinColumns = @JoinColumn(name = "libro_id", referencedColumnName = "id_libro"))
+    @JoinTable(name = "autores_libros",
+            joinColumns = @JoinColumn(name = "autor_id", referencedColumnName = "id_autor"),
+            inverseJoinColumns = @JoinColumn(name = "libro_id", referencedColumnName = "id_libro"))
     private List<Libro> libros = new ArrayList<>();
-
     public Autor(){}
-
     public Autor(DatosAutor datosAutor){
-        this.nombre = datosAutor.nombre();
-        this.fechaNacimiento = datosAutor.fechaNacimiento();
-        this.fechaFallcimiento = datosAutor.fechaFallcimiento();
+        this.nombre = datosAutor.getNombre();
+        this.fechaNacimiento = datosAutor.getFechaNacimiento();
+        this.fechaFallecimiento = datosAutor.getFechaFallecimiento();
     }
 
-    public String getFechaFallcimiento() {
-        return fechaFallcimiento;
+    public String getFechaFallecimiento() {
+        return fechaFallecimiento;
     }
 
-    public void setFechaFallcimiento(String fechaFallcimiento) {
-        this.fechaFallcimiento = fechaFallcimiento;
+    public void setFechaFallecimiento(String fechaFallcimiento) {
+        this.fechaFallecimiento = fechaFallcimiento;
     }
 
     public String getFechaNacimiento() {
@@ -73,7 +71,7 @@ public class Autor {
         return "Autor{" +
                 ", nombre='" + nombre + '\'' +
                 ", fechaNacimiento='" + fechaNacimiento + '\'' +
-                ", fechaFallcimiento='" + fechaFallcimiento + '\'' +
+                ", fechaFallcimiento='" + fechaFallecimiento + '\'' +
                 ", libros=" + libros +
                 '}';
     }

@@ -1,6 +1,6 @@
 package org.example.literalurachallenge;
 
-import org.example.literalurachallenge.model.Incio;
+import org.example.literalurachallenge.model.Inicio;
 import org.example.literalurachallenge.repositories.AutorRepository;
 import org.example.literalurachallenge.repositories.LibroRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +21,7 @@ public class LiterAluraChallengeApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        Incio incio = new Incio();
+        Inicio incio = new Inicio(libroRepository,autorRepository);
         incio.muestraMenu();
-
     }
 }

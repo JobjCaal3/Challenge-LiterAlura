@@ -4,8 +4,8 @@ import jakarta.persistence.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.OptionalDouble;
+import java.util.stream.Collectors;
+
 
 @Entity
 @Table(name = "libros")
@@ -15,21 +15,39 @@ public class Libro {
     @Column(name = "id_libro")
     private Long idLibro;
     private String titulo;
-    private String lenguaje;
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "libro_lenguaje")
+    @Column(name = "lenguaje")
+    private List<String> lenguaje;
     private Double descargas;
     private String portada;
-    @ManyToMany(mappedBy = "libros")
+    @ManyToMany(mappedBy = "libros", fetch = FetchType.EAGER)
     private List<Autor> autores = new ArrayList<>();
 
     public Libro(){}
 
     public Libro(DatosLibro datosLibro){
-        this.titulo = datosLibro.titulo();
-        if (datosLibro.lenguaje() != null) {
-            this.lenguaje = datosLibro.lenguaje();
-        }
-        this.descargas = (datosLibro.descargas() != null) ? datosLibro.descargas() : 0.0;
-        this.portada = datosLibro.portada();
+        this.titulo = datosLibro.getTitulo();
+        this.lenguaje = datosLibro.getLenguaje();
+        this.descargas = (datosLibro.getDescargas() != null) ? datosLibro.getDescargas() : 0.0;
+        this.portada = datosLibro.getPortada().getPortada();
+    }
+
+
+    public String getPortada() {
+        return portada;
+    }
+
+    public void setPortada(String portada) {
+        this.portada = portada;
+    }
+
+    public List<String> getLenguaje() {
+        return lenguaje;
+    }
+
+    public void setLenguaje(List<String> lenguaje) {
+        this.lenguaje = lenguaje;
     }
 
     public List<Autor> getAutores() {
@@ -56,22 +74,6 @@ public class Libro {
         this.idLibro = idLibro;
     }
 
-    public String getLenguaje() {
-        return lenguaje;
-    }
-
-    public void setLenguaje(String lenguaje) {
-        this.lenguaje = lenguaje;
-    }
-
-    public String getPortada() {
-        return portada;
-    }
-
-    public void setPortada(String portada) {
-        this.portada = portada;
-    }
-
     public String getTitulo() {
         return titulo;
     }
@@ -79,14 +81,5 @@ public class Libro {
     public void setTitulo(String titulo) {
         this.titulo = titulo;
     }
-    @Override
-    public String toString() {
-        return "Libro{" +
-                ", titulo='" + titulo + '\'' +
-                ", lenguaje='" + lenguaje + '\'' +
-                ", descargas=" + descargas +
-                ", portada='" + portada + '\'' +
-                ", autores=" + autores +
-                '}';
-    }
+
 }
