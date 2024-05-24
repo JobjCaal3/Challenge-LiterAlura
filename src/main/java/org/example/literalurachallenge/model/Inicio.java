@@ -7,6 +7,7 @@ import org.example.literalurachallenge.service.ConsumoAPI;
 import org.example.literalurachallenge.service.ConvierteDatos;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Inicio {
     private Scanner entrada = new Scanner(System.in);
@@ -53,7 +54,7 @@ public class Inicio {
                     buscarAutoresRangoanio();
                     break;
                 case 5:
-
+                    buscarPorLenguaje();
                     break;
                 case 0:
                     System.out.println("Saliendo de la app");
@@ -69,26 +70,25 @@ public class Inicio {
         var tituloLibro = entrada.nextLine();
         var json = consumoAPI.obtenerDatos(URL_BASE + "?search=" + tituloLibro.replace(" ", "+"));
         var datosBusqueda = conversor.obtenerDatos(json, DatosGenerales.class);
-        Optional<DatosLibro> LibroBusqueda = datosBusqueda.resultados.stream()
+        Optional<DatosLibro> libroBusqueda = datosBusqueda.resultados.stream()
                 .filter(l -> l.getTitulo().toLowerCase().contains(tituloLibro.toLowerCase())).findFirst();
-        if (LibroBusqueda.isPresent()) {
-            // Crear y guardar los autores
-            List<Autor> autores = new ArrayList<>();
-            for (DatosAutor datosAutor : LibroBusqueda.get().getAutor()) {
-                autor = new Autor(datosAutor);
-                autor = autorRepo.save(autor);
-                autores.add(autor);
-            }
-            // Crear el libro
-            libro = new Libro(LibroBusqueda.get());
-            libro.setAutores(autores);
-            libro.setLenguaje(LibroBusqueda.get().getLenguaje());
-            // Guardar el libro con sus autores
-            libro = libroRepo.save(libro);
-            // Actualizar los autores con el nuevo libro
-            for (Autor autor : autores) {
-                autor.getLibros().add(libro);
-                autorRepo.save(autor);
+
+        if (libroBusqueda.isPresent()) {
+            Optional<Libro> libroExistente = libroRepo.findByTitulo(libroBusqueda.get().getTitulo());
+            if(libroExistente.isPresent()) {
+                System.out.println("El libro ya existe en la base de datos.");
+            } else {
+                // Crear y guardar los autores
+                libro = new Libro(libroBusqueda.get());
+
+                List<Autor> autores = new ArrayList<>();
+                for (DatosAutor datosAutor : libroBusqueda.get().getAutor()) {
+                    autor = new Autor(datosAutor);
+                    autores.add(autor);
+                }
+                libro.setAutores(autores);
+                libroRepo.save(libro);
+                System.out.println("Libro guardado");
             }
         } else {
             System.out.println("No se encontró ningún libro que coincida con tu búsqueda.");
@@ -132,5 +132,28 @@ public class Inicio {
             a.getLibros().forEach(libro -> System.out.println("- " + libro.getTitulo()));
             System.out.println();
         });
+    }
+
+    public void buscarPorLenguaje(){
+        Set<String> lenguajes = libroRepo.findAll().stream()
+                .flatMap(libro -> libro.getLenguaje().stream())
+                .collect(Collectors.toSet());
+        lenguajes.forEach(System.out::println);
+
+        System.out.println("Ingrese el acronimo del lenguaje por el cual se van a buscar los libros: ");
+        var acronimoLenguaje = entrada.nextLine();
+
+        List<Libro> librosPorLenguaje = libroRepo.findAllByLenguaje(acronimoLenguaje);
+        if (!librosPorLenguaje.isEmpty()){
+            librosPorLenguaje.stream().forEach(l -> {
+                System.out.println("\n-------------Datos del libro-------------");
+                System.out.printf("Titulo: %s - Lenguaje: %s - Descargas: %s - Portada: %s\n",
+                        l.getTitulo(), l.getLenguaje(), l.getDescargas(), l.getPortada());
+                System.out.println("-------------Datos del Autor del libro-------------");
+                l.getAutores().forEach(a -> System.out.printf("Nombre: %s - Fecha Nacimiento: %s - Fecha Fallecimiento: %s\n",
+                        a.getNombre(), a.getFechaNacimiento(), a.getFechaFallecimiento()));
+            });
+        }
+
     }
 }

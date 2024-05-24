@@ -15,13 +15,13 @@ public class Autor {
     private String nombre;
     private String fechaNacimiento;
     private String fechaFallecimiento;
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinTable(name = "autores_libros",
-            joinColumns = @JoinColumn(name = "autor_id", referencedColumnName = "id_autor"),
-            inverseJoinColumns = @JoinColumn(name = "libro_id", referencedColumnName = "id_libro"))
+    @ManyToMany(mappedBy = "autores", fetch = FetchType.EAGER)
     private List<Libro> libros = new ArrayList<>();
-    public Autor(){}
-    public Autor(DatosAutor datosAutor){
+
+    public Autor() {
+    }
+
+    public Autor(DatosAutor datosAutor) {
         this.nombre = datosAutor.getNombre();
         this.fechaNacimiento = datosAutor.getFechaNacimiento();
         this.fechaFallecimiento = datosAutor.getFechaFallecimiento();
@@ -66,6 +66,7 @@ public class Autor {
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
+
     @Override
     public String toString() {
         return "Autor{" +

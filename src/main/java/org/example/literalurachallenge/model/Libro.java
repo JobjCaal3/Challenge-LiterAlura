@@ -21,7 +21,10 @@ public class Libro {
     private List<String> lenguaje;
     private Double descargas;
     private String portada;
-    @ManyToMany(mappedBy = "libros", fetch = FetchType.EAGER)
+
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinTable(name = "autores_libros", joinColumns = @JoinColumn(name = "libro_id", referencedColumnName = "id_libro"),
+            inverseJoinColumns = @JoinColumn(name = "autor_id", referencedColumnName = "id_autor"))
     private List<Autor> autores = new ArrayList<>();
 
     public Libro(){}

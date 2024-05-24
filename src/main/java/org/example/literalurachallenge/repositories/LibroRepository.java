@@ -12,6 +12,5 @@ import java.util.Optional;
 @Repository
 public interface LibroRepository extends JpaRepository<Libro,Long> {
     Optional<Libro> findByTitulo(String titulo);
-    @Query("SELECT DISTINCT l.lenguaje FROM Libro l")
-    List<String> findDistinctLenguaje();
+    List<Libro> findAllByLenguaje(String lenguaje);
 }
